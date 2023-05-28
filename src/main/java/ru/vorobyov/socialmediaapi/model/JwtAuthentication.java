@@ -1,17 +1,13 @@
 package ru.vorobyov.socialmediaapi.model;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import java.util.Collection;
 
-@Getter
-@Setter
 public class JwtAuthentication implements Authentication {
 
     private boolean authenticated;
-    private String username;
+    private String email;
     private String firstName;
 
     @Override
@@ -24,7 +20,7 @@ public class JwtAuthentication implements Authentication {
     public Object getDetails() { return null; }
 
     @Override
-    public Object getPrincipal() { return username; }
+    public Object getPrincipal() { return email; }
 
     @Override
     public boolean isAuthenticated() { return authenticated; }
@@ -37,4 +33,19 @@ public class JwtAuthentication implements Authentication {
     @Override
     public String getName() { return firstName; }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
 }

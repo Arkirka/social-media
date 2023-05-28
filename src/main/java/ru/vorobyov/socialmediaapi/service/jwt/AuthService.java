@@ -3,31 +3,41 @@ package ru.vorobyov.socialmediaapi.service.jwt;
 import io.jsonwebtoken.Claims;
 import jakarta.security.auth.message.AuthException;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.vorobyov.socialmediaapi.dto.JwtRequest;
-import ru.vorobyov.socialmediaapi.dto.JwtResponse;
-import ru.vorobyov.socialmediaapi.dto.RegisterRequest;
+import ru.vorobyov.socialmediaapi.dto.authorization.LoginRequest;
+import ru.vorobyov.socialmediaapi.dto.authorization.LoginResponse;
+import ru.vorobyov.socialmediaapi.dto.authorization.RegisterRequest;
 import ru.vorobyov.socialmediaapi.entity.User;
 import ru.vorobyov.socialmediaapi.model.JwtAuthentication;
 import ru.vorobyov.socialmediaapi.service.database.RefreshTokenService;
 import ru.vorobyov.socialmediaapi.service.database.UserService;
 
 @Service
-@RequiredArgsConstructor
 public class AuthService {
     private final UserService userService;
     private final JwtProvider jwtProvider;
     private final RefreshTokenService refreshTokenService;
 
-    public JwtResponse login(@NonNull JwtRequest authRequest) throws AuthException {
-        final User user = userService.getByLogin(authRequest.getLogin())
+    public AuthService(UserService userService, JwtProvider jwtProvider, RefreshTokenService refreshTokenService) {
+        this.userService = userService;
+        this.jwtProvider = jwtProvider;
+        this.refreshTokenService = refreshTokenService;
+    }
+
+    public LoginResponse login(@NonNull LoginRequest authRequest) throws AuthException {
+        final User user = userService.getByEmail(authRequest.getEmail())
                 .orElseThrow(() -> new AuthException("Пользователь не найден"));
-        if (user.getPassword().equals(authRequest.getPassword())) {
+
+
+        boolean isPasswordMatches = matchHashes(authRequest.getPassword(), user.getPassword());
+
+        if (isPasswordMatches) {
             final String accessToken = jwtProvider.generateAccessToken(user);
             final String refreshToken = jwtProvider.generateRefreshToken(user.getId());
-            return new JwtResponse(accessToken, refreshToken);
+            return new LoginResponse(accessToken, refreshToken);
         } else {
             throw new AuthException("Неправильный пароль");
         }
@@ -35,37 +45,52 @@ public class AuthService {
 
     public boolean register(@NonNull RegisterRequest request){
         User user = new User();
-        user.setLogin(request.getLogin());
-        user.setPassword(request.getPassword());
+        user.setEmail(request.getEmail());
+        user.setPassword(hash(request.getPassword()));
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         return userService.create(user).isPresent();
     }
 
-    public JwtResponse getAccessToken(@NonNull String refreshToken, @NonNull String accessToken) throws AuthException {
+    public LoginResponse getAccessToken(@NonNull String refreshToken, @NonNull String accessToken) throws AuthException {
         if (jwtProvider.validateRefreshToken(refreshToken)) {
             final Claims claims = jwtProvider.getAccessClaims(accessToken);
-            final String login = claims.getSubject();
-            final User user = userService.getByLogin(login)
+            final String email = claims.getSubject();
+            final User user = userService.getByEmail(email)
                     .orElseThrow(() -> new AuthException("Пользователь не найден"));
             var refreshTokenOptional = refreshTokenService.findByToken(refreshToken);
             if (refreshTokenOptional.isEmpty() || !refreshTokenOptional.get().getToken().equals(refreshToken))
                 throw new AuthException("Токен не найден");
             final String newAccessToken = jwtProvider.generateAccessToken(user);
-            return new JwtResponse(newAccessToken, null);
+            return new LoginResponse(newAccessToken, null);
         }
-        return new JwtResponse(null, null);
+        return new LoginResponse(null, null);
     }
 
-    public JwtResponse getNewRefreshToken(@NonNull String oldRefreshToken) {
+    public LoginResponse getNewRefreshToken(@NonNull String oldRefreshToken) {
         var user = refreshTokenService.findByToken(oldRefreshToken);
         if (user.isEmpty())
             return null;
-        return new JwtResponse(null, jwtProvider.generateRefreshToken(user.get().getId()));
+        return new LoginResponse(null, jwtProvider.generateRefreshToken(user.get().getId()));
     }
 
     public JwtAuthentication getAuthInfo() {
-        return (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth instanceof JwtAuthentication) {
+            return (JwtAuthentication) auth;
+        } else {
+            return null;
+        }
+    }
+
+    public String hash(String hashableLine) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(16);
+        return encoder.encode(hashableLine);
+    }
+
+    public boolean matchHashes(String line, String hash) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(16);
+        return encoder.matches(line, hash);
     }
 
 }

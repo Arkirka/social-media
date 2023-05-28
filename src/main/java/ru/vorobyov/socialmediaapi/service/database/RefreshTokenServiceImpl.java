@@ -1,7 +1,6 @@
 package ru.vorobyov.socialmediaapi.service.database;
 
 import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -13,14 +12,17 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service("refreshTokenService")
-@RequiredArgsConstructor
 @Slf4j
 public class RefreshTokenServiceImpl implements RefreshTokenService{
     private final UserService userService;
     private final RefreshTokenRepository refreshTokenRepository;
-
     @Value("${jwt.refresh.expirationMs}")
     private Long refreshTokenDurationMs;
+
+    public RefreshTokenServiceImpl(UserService userService, RefreshTokenRepository refreshTokenRepository) {
+        this.userService = userService;
+        this.refreshTokenRepository = refreshTokenRepository;
+    }
 
     @Override
     public Optional<RefreshToken> findByToken(String token) {

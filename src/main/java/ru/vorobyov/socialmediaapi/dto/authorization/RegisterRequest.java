@@ -1,4 +1,4 @@
-package ru.vorobyov.socialmediaapi.dto;
+package ru.vorobyov.socialmediaapi.dto.authorization;
 
 import com.fasterxml.jackson.annotation.*;
 
@@ -8,15 +8,15 @@ import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "login",
+        "email",
         "password",
         "firstName",
         "lastName"
 })
 @Generated("jsonschema2pojo")
 public class RegisterRequest {
-    @JsonProperty("login")
-    private String login;
+    @JsonProperty("email")
+    private String email;
     @JsonProperty("password")
     private String password;
     @JsonProperty("firstName")
@@ -26,14 +26,14 @@ public class RegisterRequest {
     @JsonIgnore
     private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
 
-    @JsonProperty("login")
-    public String getLogin() {
-        return login;
+    @JsonProperty("email")
+    public String getEmail() {
+        return email;
     }
 
-    @JsonProperty("login")
-    public void setLogin(String login) {
-        this.login = login;
+    @JsonProperty("email")
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     @JsonProperty("password")
