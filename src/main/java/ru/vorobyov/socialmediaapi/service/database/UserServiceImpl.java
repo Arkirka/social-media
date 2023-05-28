@@ -1,7 +1,6 @@
 package ru.vorobyov.socialmediaapi.service.database;
 
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.vorobyov.socialmediaapi.entity.User;
 import ru.vorobyov.socialmediaapi.repository.UserRepository;
@@ -9,12 +8,15 @@ import ru.vorobyov.socialmediaapi.repository.UserRepository;
 import java.util.Optional;
 
 @Service("userService")
-@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
-    public Optional<User> getByLogin(@NonNull String login) {
-        return userRepository.findByLogin(login);
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    public Optional<User> getByEmail(@NonNull String email) {
+        return userRepository.findByEmail(email);
     }
 
     @Override
