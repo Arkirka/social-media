@@ -1,16 +1,13 @@
 package ru.vorobyov.socialmediaapi.service.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.vorobyov.socialmediaapi.entity.User;
@@ -23,28 +20,30 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
-@Slf4j
 @Component
 public class JwtProvider {
     private final SecretKey jwtAccessSecret;
     private final RefreshTokenService refreshTokenService;
+    private static final Logger log = LoggerFactory.getLogger(JwtProvider.class);
+    private final Long tokenExpireTimeMins;
 
     public JwtProvider(
             @Value("${jwt.secret.access}") String jwtAccessSecret,
+            @Value("${jwt.access.expirationMins}") Long tokenExpireTimeMins,
             RefreshTokenService refreshTokenService) {
         this.jwtAccessSecret = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtAccessSecret));
+        this.tokenExpireTimeMins = tokenExpireTimeMins;
         this.refreshTokenService = refreshTokenService;
     }
 
     public String generateAccessToken(@NonNull User user) {
         final LocalDateTime now = LocalDateTime.now();
-        final Instant accessExpirationInstant = now.plusMinutes(5).atZone(ZoneId.systemDefault()).toInstant();
+        final Instant accessExpirationInstant = now.plusMinutes(tokenExpireTimeMins).atZone(ZoneId.systemDefault()).toInstant();
         final Date accessExpiration = Date.from(accessExpirationInstant);
         return Jwts.builder()
-                .setSubject(user.getLogin())
                 .setExpiration(accessExpiration)
                 .signWith(jwtAccessSecret)
-                .claim("firstName", user.getFirstName())
+                .claim("email", user.getEmail())
                 .compact();
     }
 
