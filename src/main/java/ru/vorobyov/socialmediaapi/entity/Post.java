@@ -36,7 +36,7 @@ public class Post {
 
     private String text;
 
-    @Column(name = "created_at")
+    @Column(name = "createdAt")
     private Instant createdAt;
 
     @OneToMany(mappedBy = "post")

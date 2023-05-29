@@ -1,10 +1,14 @@
 package ru.vorobyov.socialmediaapi.service.database;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.vorobyov.socialmediaapi.entity.Post;
+import ru.vorobyov.socialmediaapi.entity.User;
 import ru.vorobyov.socialmediaapi.repository.PostRepository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,12 +22,19 @@ public class PostServiceImpl implements PostService{
 
     @Override
     public Optional<Post> add(Post post) {
+        post.setCreatedAt(Instant.now());
         return Optional.of(postRepository.save(post));
     }
 
     @Override
     public List<Post> findAll() {
         return postRepository.findAll();
+    }
+
+    @Override
+    public Page<Post> findAllByAuthorsPaging(List<User> authors, Pageable pageable) {
+        var ids = authors.stream().map(User::getId).toList();
+        return postRepository.findByUsers(ids, pageable);
     }
 
     @Override
