@@ -9,13 +9,12 @@ public class User {
     }
 
     public User(Long id, String email, String password,
-                String firstName, String lastName, RefreshToken refreshToken) {
+                String firstName, String lastName) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.refreshToken = refreshToken;
     }
 
     @Id
@@ -33,10 +32,6 @@ public class User {
 
     @Column(nullable = false)
     private String lastName;
-
-    @OneToOne
-    @JoinColumn(name = "refresh_token_id", referencedColumnName = "id")
-    private RefreshToken refreshToken;
 
     public Long getId() {
         return id;
@@ -76,13 +71,5 @@ public class User {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public RefreshToken getRefreshToken() {
-        return refreshToken;
-    }
-
-    public void setRefreshToken(RefreshToken refreshToken) {
-        this.refreshToken = refreshToken;
     }
 }
