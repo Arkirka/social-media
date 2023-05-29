@@ -3,8 +3,16 @@ package ru.vorobyov.socialmediaapi.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "messages")
+@Table(name = "subscriptions")
 public class Subscription {
+    public Subscription() {
+    }
+
+    public Subscription(User author, User subscriber) {
+        this.author = author;
+        this.subscriber = subscriber;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false)
