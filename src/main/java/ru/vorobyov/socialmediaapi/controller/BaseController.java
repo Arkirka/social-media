@@ -19,7 +19,7 @@ abstract class BaseController {
 
     User getCurrentUser() throws EntityNotFoundException{
         String email = getCurrentUserEmail();
-        return userService.getByEmail(email).orElseThrow(EntityNotFoundException::new);
+        return userService.findByEmail(email).orElseThrow(EntityNotFoundException::new);
     }
 
     ResponseEntity<?> getServiceUnavailableResponse(String message){
@@ -33,6 +33,13 @@ abstract class BaseController {
         return new ResponseEntity<>(
                 message,
                 HttpStatus.NOT_FOUND
+        );
+    }
+
+    ResponseEntity<?> getConflictResponse(String message){
+        return new ResponseEntity<>(
+                message,
+                HttpStatus.CONFLICT
         );
     }
 
