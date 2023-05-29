@@ -48,7 +48,7 @@ public class JwtProvider {
     }
 
     public String generateRefreshToken(@NonNull Long userId) throws EntityNotFoundException {
-        return refreshTokenService.createRefreshToken(userId).getToken();
+        return refreshTokenService.addByUserId(userId).getToken();
     }
 
     public boolean validateAccessToken(@NonNull String accessToken) {

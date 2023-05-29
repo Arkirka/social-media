@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.vorobyov.socialmediaapi.entity.User;
 import ru.vorobyov.socialmediaapi.repository.UserRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service("userService")
@@ -15,7 +16,7 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
     }
 
-    public Optional<User> getByEmail(@NonNull String email) {
+    public Optional<User> findByEmail(@NonNull String email) {
         return userRepository.findByEmail(email);
     }
 
@@ -25,7 +26,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> create(User user) {
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    public Optional<User> add(User user) {
         return Optional.of(userRepository.save(user));
     }
 }

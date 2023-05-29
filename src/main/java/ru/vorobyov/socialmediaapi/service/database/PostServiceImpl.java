@@ -21,18 +21,18 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public List<Post> getAll() {
+    public List<Post> findAll() {
         return postRepository.findAll();
     }
 
     @Override
-    public Optional<Post> getById(Long id) {
+    public Optional<Post> findById(Long id) {
         return postRepository.findById(id);
     }
 
     @Override
     public Optional<Post> updateById(Long id, Post post) {
-        var postOptional = getById(id);
+        var postOptional = findById(id);
         if (postOptional.isEmpty())
             return Optional.empty();
 

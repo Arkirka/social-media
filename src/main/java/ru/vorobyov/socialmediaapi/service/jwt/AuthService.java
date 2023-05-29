@@ -28,7 +28,7 @@ public class AuthService {
     }
 
     public LoginResponse login(@NonNull LoginRequest authRequest) throws AuthException {
-        final User user = userService.getByEmail(authRequest.getEmail())
+        final User user = userService.findByEmail(authRequest.getEmail())
                 .orElseThrow(() -> new AuthException("Пользователь не найден"));
 
 
@@ -49,14 +49,14 @@ public class AuthService {
         user.setPassword(hash(request.getPassword()));
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
-        return userService.create(user).isPresent();
+        return userService.add(user).isPresent();
     }
 
     public LoginResponse getAccessToken(@NonNull String refreshToken, @NonNull String accessToken) throws AuthException {
         if (jwtProvider.validateRefreshToken(refreshToken)) {
             final Claims claims = jwtProvider.getAccessClaims(accessToken);
             final String email = claims.getSubject();
-            final User user = userService.getByEmail(email)
+            final User user = userService.findByEmail(email)
                     .orElseThrow(() -> new AuthException("Пользователь не найден"));
             var refreshTokenOptional = refreshTokenService.findByToken(refreshToken);
             if (refreshTokenOptional.isEmpty() || !refreshTokenOptional.get().getToken().equals(refreshToken))

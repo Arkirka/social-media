@@ -7,8 +7,8 @@ import java.util.Optional;
 
 public interface PostService {
     Optional<Post> add(Post post);
-    List<Post> getAll();
-    Optional<Post> getById(Long id);
+    List<Post> findAll();
+    Optional<Post> findById(Long id);
     Optional<Post> updateById(Long id, Post post);
     void deleteById(Long id);
 }
