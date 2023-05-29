@@ -40,8 +40,8 @@ public class PostController extends BaseController{
     /**
      * Create post.
      *
-     * @param request the request
-     * @return the response entity with status code
+     * @param request the request with post parameters
+     * @return response entity object with status
      */
     @PostMapping()
     public ResponseEntity<?> add(@RequestBody ModifyPostRequest request) {
@@ -53,26 +53,22 @@ public class PostController extends BaseController{
                     HttpStatus.BAD_REQUEST
             );
 
-        try {
-            var postOptional = addPost(request.getTitle(), request.getText());
-            boolean isPostCreated = postOptional.isPresent();
+        var postOptional = addPost(request.getTitle(), request.getText());
+        boolean isPostCreated = postOptional.isPresent();
 
-            if (!isPostCreated)
-                return getServiceUnavailableResponse("Не получилось создать пост! Попробуйте позже!");
+        if (!isPostCreated)
+            return getServiceUnavailableResponse("Не получилось создать пост! Попробуйте позже!");
 
-            if (isImagesEmpty)
-                return new ResponseEntity<>(HttpStatus.CREATED);
-
-            boolean isImageCreated = addImage(postOptional.get(), request.getImages());
-
-            if (!isImageCreated)
-                return getServiceUnavailableResponse("Не получилось прикрепить изображения! Попробуйте позже!");
-
+        if (isImagesEmpty)
             return new ResponseEntity<>(HttpStatus.CREATED);
-        } catch (EntityNotFoundException e){
 
-            return getNotFoundResponse("Ошибка при загрузке данных пользователя");
-        }
+        boolean isImageCreated = addImage(postOptional.get(), request.getImages());
+
+        if (!isImageCreated)
+            return getServiceUnavailableResponse("Не получилось прикрепить изображения! Попробуйте позже!");
+
+        return new ResponseEntity<>(HttpStatus.CREATED);
+
     }
 
     private boolean isPostRequestNotValid(ModifyPostRequest request){
@@ -101,11 +97,11 @@ public class PostController extends BaseController{
     /**
      * Gets all posts.
      *
-     * @return all posts.
+     * @return response entity object with post objects.
      */
     @GetMapping()
     public ResponseEntity<?> getAll() {
-        List<Post> posts = postService.getAll();
+        List<Post> posts = postService.findAll();
         List<PostDto> response = parsePostListToDto(posts);
         return ResponseEntity.ok(response);
     }
@@ -114,11 +110,11 @@ public class PostController extends BaseController{
      * Gets post by id.
      *
      * @param postId the post id
-     * @return the post
+     * @return response entity object with post object.
      */
     @GetMapping("{postId}")
     public ResponseEntity<?> getById(@PathVariable Long postId) {
-        var postOptional = postService.getById(postId);
+        var postOptional = postService.findById(postId);
         if (postOptional.isEmpty())
             return getNotFoundResponse("Запись не найдена");
 
@@ -151,8 +147,8 @@ public class PostController extends BaseController{
      * Update post by id.
      *
      * @param postID  the post id
-     * @param request the request
-     * @return the response entity
+     * @param request the request with post parameters
+     * @return response entity object with status
      */
     @PutMapping("{postID}")
     public ResponseEntity<?> updateById(@PathVariable Long postID, @RequestBody ModifyPostRequest request) {
@@ -180,7 +176,7 @@ public class PostController extends BaseController{
     }
 
     private boolean isUpdateRequestValid(Long postID, ModifyPostRequest request){
-        var postOptional = postService.getById(postID);
+        var postOptional = postService.findById(postID);
         if (postOptional.isEmpty())
             return false;
 
@@ -202,11 +198,11 @@ public class PostController extends BaseController{
      * Delete post by id.
      *
      * @param postID the post id
-     * @return no content
+     * @return response entity object with status
      */
     @DeleteMapping("{postID}")
     public ResponseEntity<?> deleteById(@PathVariable Long postID) {
-        var postOptional = postService.getById(postID);
+        var postOptional = postService.findById(postID);
         if (postOptional.isEmpty())
             return getNotFoundResponse("Пост не найден!");
 
