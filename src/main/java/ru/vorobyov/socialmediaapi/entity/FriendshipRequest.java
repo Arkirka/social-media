@@ -6,17 +6,27 @@ import ru.vorobyov.socialmediaapi.constant.FriendshipStatus;
 @Entity
 @Table(name = "friendship_requests")
 public class FriendshipRequest {
+
+    public FriendshipRequest() {
+    }
+
+    public FriendshipRequest(User sender, User recipient, FriendshipStatus status) {
+        this.sender = sender;
+        this.recipient = recipient;
+        this.status = status;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id")
-    private User user;
+    private User sender;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipient_id")
-    private User friend;
+    private User recipient;
 
     @Enumerated(EnumType.STRING)
     private FriendshipStatus status;
@@ -29,20 +39,20 @@ public class FriendshipRequest {
         this.id = id;
     }
 
-    public User getUser() {
-        return user;
+    public User getSender() {
+        return sender;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setSender(User sender) {
+        this.sender = sender;
     }
 
-    public User getFriend() {
-        return friend;
+    public User getRecipient() {
+        return recipient;
     }
 
-    public void setFriend(User friend) {
-        this.friend = friend;
+    public void setRecipient(User recipient) {
+        this.recipient = recipient;
     }
 
     public FriendshipStatus getStatus() {

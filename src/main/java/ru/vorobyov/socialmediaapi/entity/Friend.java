@@ -7,6 +7,15 @@ import jakarta.persistence.*;
         @Index(name = "idx_user_friend", columnList = "user_id, friend_id")
 })
 public class Friend {
+
+    public Friend() {
+    }
+
+    public Friend(User user, User friend) {
+        this.user = user;
+        this.friend = friend;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
