@@ -30,7 +30,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService{
     }
 
     @Override
-    public RefreshToken createRefreshToken(Long userId) throws EntityNotFoundException {
+    public RefreshToken addByUserId(Long userId) throws EntityNotFoundException {
         RefreshToken refreshToken = new RefreshToken();
         var user = userService.findById(userId);
 
