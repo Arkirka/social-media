@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import ru.vorobyov.socialmediaapi.dto.user.UserDto;
 import ru.vorobyov.socialmediaapi.entity.User;
 import ru.vorobyov.socialmediaapi.service.database.UserService;
 
@@ -50,5 +51,12 @@ abstract class BaseController {
                 return (String) authentication.getPrincipal();
         }
         return "";
+    }
+
+    UserDto parseUserToDto(User user){
+        return new UserDto(
+                user.getId(), user.getEmail(),
+                user.getFirstName(), user.getLastName()
+        );
     }
 }

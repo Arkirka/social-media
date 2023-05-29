@@ -6,11 +6,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.vorobyov.socialmediaapi.constant.FriendshipStatus;
 import ru.vorobyov.socialmediaapi.dto.user.UserDto;
-import ru.vorobyov.socialmediaapi.entity.Friend;
+import ru.vorobyov.socialmediaapi.entity.Friendship;
 import ru.vorobyov.socialmediaapi.entity.FriendshipRequest;
 import ru.vorobyov.socialmediaapi.entity.Subscription;
 import ru.vorobyov.socialmediaapi.entity.User;
-import ru.vorobyov.socialmediaapi.service.database.FriendService;
+import ru.vorobyov.socialmediaapi.service.database.FriendshipService;
 import ru.vorobyov.socialmediaapi.service.database.FriendshipRequestService;
 import ru.vorobyov.socialmediaapi.service.database.SubscriptionService;
 import ru.vorobyov.socialmediaapi.service.database.UserService;
@@ -28,17 +28,17 @@ public class UserController extends BaseController{
     private final UserService userService;
     private final FriendshipRequestService friendshipRequestService;
     private final SubscriptionService subscriptionService;
-    private final FriendService friendService;
+    private final FriendshipService friendshipService;
 
     UserController(UserService userService,
                    FriendshipRequestService friendshipRequestService,
                    SubscriptionService subscriptionService,
-                   FriendService friendService) {
+                   FriendshipService friendshipService) {
         super(userService);
         this.userService = userService;
         this.friendshipRequestService = friendshipRequestService;
         this.subscriptionService = subscriptionService;
-        this.friendService = friendService;
+        this.friendshipService = friendshipService;
     }
 
     /**
@@ -57,13 +57,6 @@ public class UserController extends BaseController{
 
     private List<UserDto> parseUserListToDto(List<User> userList){
         return userList.stream().map(this::parseUserToDto).toList();
-    }
-
-    private UserDto parseUserToDto(User user){
-        return new UserDto(
-                user.getId(), user.getEmail(),
-                user.getFirstName(), user.getLastName()
-        );
     }
 
     /**
@@ -131,8 +124,7 @@ public class UserController extends BaseController{
 
     private boolean addFriend(User recipient, User sender){
         return friendshipRequestService.updateToAccepted(sender, recipient).isPresent() &&
-                friendService.add(new Friend(recipient, sender)).isPresent() &&
-                friendService.add(new Friend(sender, recipient)).isPresent() &&
+                friendshipService.add(new Friendship(recipient, sender)).isPresent() &&
                 addSubscription(recipient, sender);
     }
 

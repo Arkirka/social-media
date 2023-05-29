@@ -3,15 +3,15 @@ package ru.vorobyov.socialmediaapi.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "friends", indexes = {
-        @Index(name = "idx_user_friend", columnList = "user_id, friend_id")
+@Table(name = "friendship", indexes = {
+        @Index(name = "idx_user_friend", columnList = "user_id, friend_id", unique = true)
 })
-public class Friend {
+public class Friendship {
 
-    public Friend() {
+    public Friendship() {
     }
 
-    public Friend(User user, User friend) {
+    public Friendship(User user, User friend) {
         this.user = user;
         this.friend = friend;
     }

@@ -5,19 +5,29 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "messages")
 public class Message {
+    public Message() {
+    }
+
+    public Message(User sender, String text, Friendship friendship) {
+        this.sender = sender;
+        this.text = text;
+        this.friendship = friendship;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_id")
+    @JoinColumn(name = "sender_id", nullable = false)
     private User sender;
 
+    @Column(name = "text")
     private String text;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "friendship_id")
-    private Friend friend;
+    @JoinColumn(name = "friendship_id", nullable = false)
+    private Friendship friendship;
 
     public long getId() {
         return id;
@@ -43,11 +53,11 @@ public class Message {
         this.text = text;
     }
 
-    public Friend getDialog() {
-        return friend;
+    public Friendship getDialog() {
+        return friendship;
     }
 
-    public void setDialog(Friend friend) {
-        this.friend = friend;
+    public void setDialog(Friendship friendship) {
+        this.friendship = friendship;
     }
 }

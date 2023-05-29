@@ -1,6 +1,7 @@
 package ru.vorobyov.socialmediaapi.service.database;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.vorobyov.socialmediaapi.entity.Post;
 import ru.vorobyov.socialmediaapi.repository.PostRepository;
 
@@ -44,6 +45,7 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
         postRepository.deleteById(id);
     }
