@@ -7,10 +7,18 @@ import ru.vorobyov.socialmediaapi.repository.MessageRepository;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The implementation of Message service.
+ */
 @Service("messageService")
 public class MessageServiceImpl implements MessageService {
     private final MessageRepository messageRepository;
 
+    /**
+     * Instantiates a new Message service.
+     *
+     * @param messageRepository the message repository
+     */
     public MessageServiceImpl(MessageRepository messageRepository) {
         this.messageRepository = messageRepository;
     }

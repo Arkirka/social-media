@@ -9,10 +9,18 @@ import ru.vorobyov.socialmediaapi.repository.SubscriptionRepository;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The implementation of Subscription service.
+ */
 @Service("subscriptionService")
 public class SubscriptionServiceImpl implements SubscriptionService{
     private final SubscriptionRepository repository;
 
+    /**
+     * Instantiates a new Subscription service.
+     *
+     * @param repository the repository
+     */
     public SubscriptionServiceImpl(SubscriptionRepository repository) {
         this.repository = repository;
     }

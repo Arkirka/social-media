@@ -8,10 +8,18 @@ import ru.vorobyov.socialmediaapi.repository.FriendshipRequestRepository;
 
 import java.util.Optional;
 
+/**
+ * The implementation of Friendship request service.
+ */
 @Service("friendshipRequestService")
 public class FriendshipRequestServiceImpl implements FriendshipRequestService{
     private final FriendshipRequestRepository repository;
 
+    /**
+     * Instantiates a new Friendship request service.
+     *
+     * @param repository the repository
+     */
     public FriendshipRequestServiceImpl(FriendshipRequestRepository repository) {
         this.repository = repository;
     }

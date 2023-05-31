@@ -5,10 +5,10 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import ru.vorobyov.socialmediaapi.entity.User;
 import ru.vorobyov.socialmediaapi.service.database.RefreshTokenService;
@@ -20,6 +20,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
+/**
+ * The provider for jwt operation.
+ */
 @Component
 public class JwtProvider {
     private final SecretKey jwtAccessSecret;
@@ -27,6 +30,13 @@ public class JwtProvider {
     private static final Logger log = LoggerFactory.getLogger(JwtProvider.class);
     private final Long tokenExpireTimeMins;
 
+    /**
+     * Instantiates a new Jwt provider.
+     *
+     * @param jwtAccessSecret     the jwt access secret
+     * @param tokenExpireTimeMins the token expire time mins
+     * @param refreshTokenService the refresh token service
+     */
     public JwtProvider(
             @Value("${jwt.secret.access}") String jwtAccessSecret,
             @Value("${jwt.access.expirationMins}") Long tokenExpireTimeMins,
@@ -36,6 +46,12 @@ public class JwtProvider {
         this.refreshTokenService = refreshTokenService;
     }
 
+    /**
+     * Generate access token string.
+     *
+     * @param user the user for whom the access token will be generated
+     * @return the access token string
+     */
     public String generateAccessToken(@NonNull User user) {
         final LocalDateTime now = LocalDateTime.now();
         final Instant accessExpirationInstant = now.plusMinutes(tokenExpireTimeMins).atZone(ZoneId.systemDefault()).toInstant();
@@ -47,14 +63,33 @@ public class JwtProvider {
                 .compact();
     }
 
+    /**
+     * Generate refresh token string.
+     *
+     * @param userId the user for whom the refresh token will be generated
+     * @return refresh token string
+     * @throws EntityNotFoundException throws if user not found
+     */
     public String generateRefreshToken(@NonNull Long userId) throws EntityNotFoundException {
         return refreshTokenService.addByUserId(userId).getToken();
     }
 
+    /**
+     * Validate access token.
+     *
+     * @param accessToken the access token
+     * @return return true if access token is valid and false otherwise
+     */
     public boolean validateAccessToken(@NonNull String accessToken) {
         return validateToken(accessToken, jwtAccessSecret);
     }
 
+    /**
+     * Validate refresh token.
+     *
+     * @param refreshToken the refresh token
+     * @return return true if refresh token is valid and false otherwise
+     */
     public boolean validateRefreshToken(@NonNull String refreshToken) {
         return refreshTokenService.verify(refreshToken);
     }
@@ -80,6 +115,12 @@ public class JwtProvider {
         return false;
     }
 
+    /**
+     * Gets claims by access token.
+     *
+     * @param token access token
+     * @return access token claims
+     */
     public Claims getAccessClaims(@NonNull String token) {
         return getClaims(token, jwtAccessSecret);
     }

@@ -37,6 +37,14 @@ import java.util.List;
 public class FeedController extends BaseController{
     private final SubscriptionService subscriptionService;
     private final PostService postService;
+
+    /**
+     * Instantiates a new Feed controller.
+     *
+     * @param userService         the user service
+     * @param subscriptionService the subscription service
+     * @param postService         the post service
+     */
     FeedController(UserService userService,
                    SubscriptionService subscriptionService,
                    PostService postService) {
@@ -48,10 +56,10 @@ public class FeedController extends BaseController{
     /**
      * Gets all post by subscriptions.
      *
-     * @param page        the page
+     * @param page        the page number
      * @param pageSize    the page size
-     * @param isAscending the is ascending
-     * @return the all
+     * @param isAscending if it's true then sort in ascending order
+     * @return response entity object of header with links and body with metadata and posts
      */
     @GetMapping(params = {"page", "per_page", "isAsc"})
     public ResponseEntity<?> getAll(@RequestParam("page") int page,
@@ -66,6 +74,9 @@ public class FeedController extends BaseController{
 
         Page<Post> postsPage =
                 getPostsFromSubscriptions(subscriptions, page, pageSize, isAscending);
+
+        if (postsPage.isEmpty())
+            return ResponseEntity.noContent().build();
 
         var links = buildLinks(postsPage, page, pageSize, isAscending);
         var responseContent = getAllFeedResponse(postsPage, page, pageSize, links);
@@ -100,28 +111,35 @@ public class FeedController extends BaseController{
     private Links buildLinks(Page<Post> postPage, int page, int pageSize, boolean isAscending) {
         var result = new Links();
         var baseUri = ServletUriComponentsBuilder.fromCurrentRequestUri().build().toUri();
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUri(baseUri);
 
-        uriBuilder.queryParam("page", page)
+        result.setSelf(UriComponentsBuilder.fromUri(baseUri)
+                .queryParam("page", page)
                 .queryParam("per_page", pageSize)
-                .queryParam("isAsc", isAscending);
-
-        result.setSelf(uriBuilder.toUriString());
-        result.setFirst(
-                uriBuilder.replaceQueryParam("page", 0).toUriString()
+                .queryParam("isAsc", isAscending)
+                .toUriString());
+        result.setFirst(UriComponentsBuilder.fromUri(baseUri)
+                .queryParam("page", 0)
+                .queryParam("per_page", pageSize)
+                .queryParam("isAsc", isAscending)
+                .toUriString()
         );
-        result.setPrevious(
-                uriBuilder.replaceQueryParam("page", page == 0 ? 0 : page - 1).toUriString()
+        result.setPrevious(UriComponentsBuilder.fromUri(baseUri)
+                .queryParam("page", page == 0 ? 0 : page - 1)
+                .queryParam("per_page", pageSize)
+                .queryParam("isAsc", isAscending)
+                .toUriString()
         );
-        result.setNext(
-                uriBuilder.replaceQueryParam(
-                        "page", postPage.getTotalPages() - page != 0 ? page + 1 : page
-                ).toUriString()
+        result.setNext(UriComponentsBuilder.fromUri(baseUri)
+                .queryParam("page", postPage.getTotalPages() != 1 ? page + 1 : page)
+                .queryParam("per_page", pageSize)
+                .queryParam("isAsc", isAscending)
+                .toUriString()
         );
-        result.setLast(
-                uriBuilder.replaceQueryParam(
-                        "page", postPage.getTotalPages() - 1
-                ).toUriString()
+        result.setLast(UriComponentsBuilder.fromUri(baseUri)
+                .queryParam("page", postPage.getTotalPages() - 1)
+                .queryParam("per_page", pageSize)
+                .queryParam("isAsc", isAscending)
+                .toUriString()
         );
 
         return result;
@@ -156,7 +174,7 @@ public class FeedController extends BaseController{
                 Sort.by( "createdAt").ascending() :
                 Sort.by( "createdAt").descending();
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, sort);
 
         return postService.findAllByAuthorsPaging(authors, pageable);
     }

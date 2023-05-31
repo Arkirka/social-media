@@ -8,9 +8,27 @@ import ru.vorobyov.socialmediaapi.entity.User;
 
 import java.util.Optional;
 
+/**
+ * The interface Friendship request repository.
+ */
 @Repository
 public interface FriendshipRequestRepository extends JpaRepository<FriendshipRequest, Long> {
+    /**
+     * Exists by sender and recipient boolean.
+     *
+     * @param sender    the sender
+     * @param recipient the recipient
+     * @return the boolean
+     */
     boolean existsBySenderAndRecipient(@NonNull User sender, @NonNull User recipient);
+
+    /**
+     * Find by sender and recipient optional.
+     *
+     * @param sender    the sender
+     * @param recipient the recipient
+     * @return the optional of FriendshipRequest
+     */
     Optional<FriendshipRequest> findBySenderAndRecipient(@NonNull User sender,
                                                          @NonNull User recipient);
 }

@@ -12,10 +12,18 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The implementation of Post service.
+ */
 @Service("postService")
 public class PostServiceImpl implements PostService{
     private final PostRepository postRepository;
 
+    /**
+     * Instantiates a new Post service.
+     *
+     * @param postRepository the post repository
+     */
     public PostServiceImpl(PostRepository postRepository) {
         this.postRepository = postRepository;
     }

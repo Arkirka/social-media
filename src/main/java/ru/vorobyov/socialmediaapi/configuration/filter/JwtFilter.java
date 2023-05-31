@@ -17,7 +17,10 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * The type Jwt filter.
+ * JWT A filter is an object that performs
+ * filtering tasks on either the request to a resource
+ * (a servlet or static content),
+ * or on the response from a resource, or both..
  */
 @Component
 public class JwtFilter extends GenericFilterBean {
@@ -26,12 +29,19 @@ public class JwtFilter extends GenericFilterBean {
 
     private final JwtProvider jwtProvider;
 
+    /**
+     * Instantiates a new Jwt filter.
+     *
+     * @param jwtProvider the jwt provider
+     */
     public JwtFilter(JwtProvider jwtProvider) {
         this.jwtProvider = jwtProvider;
     }
 
     /**
-     * Filter method.
+     * The doFilter method of the Filter is called by the container each time
+     * a request/response pair is passed through the chain due
+     * to a client request for a resource at the end of the chain.
      *
      * @param request the request
      * @param response the response
@@ -59,6 +69,12 @@ public class JwtFilter extends GenericFilterBean {
         return null;
     }
 
+    /**
+     * Generate info token jwt authentication.
+     *
+     * @param claims the claims
+     * @return the jwt authentication
+     */
     public static JwtAuthentication generateInfoToken(Map<String, Object> claims) {
 
         JwtAuthentication jwtAuthentication = new JwtAuthentication();
