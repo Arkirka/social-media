@@ -13,5 +13,12 @@ services:
     ports:
       - "5432:5432"
 
+  spring_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+
 volumes:
   postgresql_data:
