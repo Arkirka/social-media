@@ -2,8 +2,8 @@ name: JavaDoc
 
 on:
   push:
-    branches:
-      - main 
+    paths:
+      - 'src/main/java/**'
 
 jobs:
   build:
@@ -19,14 +19,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
-          
-      - name: Install Docker
-        run: |
-           sudo apt-get update
-           sudo apt-get install docker
 
       - name: Build with Maven
-        run: mvn clean install
+        run: mvn clean install -DskipTests
 
       - name: Generate JavaDoc
         run: mvn javadoc:javadoc
