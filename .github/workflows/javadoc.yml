@@ -26,6 +26,18 @@ jobs:
 
       - name: Generate JavaDoc
         run: mvn javadoc:javadoc
-
+      
+      - name: Configure Git
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ secrets.EMAIL }}"
+          
       - name: Copy JavaDoc to project directory
         run: cp -R target/site/apidocs ${{ github.workspace }}/docs
+
+      - name: Publish to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.TOKEN }}
+          publish_dir: ./docs
+
