@@ -19,6 +19,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
+          
+      - name: Install Docker
+        run: |
+           sudo apt-get update
+           sudo apt-get install docker
 
       - name: Build with Maven
         run: mvn clean install
