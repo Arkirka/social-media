@@ -8,34 +8,38 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.vorobyov.socialmediaapi.dto.authorization.*;
+import ru.vorobyov.socialmediaapi.service.database.UserService;
 import ru.vorobyov.socialmediaapi.service.jwt.AuthService;
 
 /**
- * The type Auth controller.
+ * Controller with authentication and authorization methods
  */
 @RestController
 @RequestMapping("api/auth")
-public class AuthController {
+public class AuthController extends BaseController{
     private final AuthService authService;
 
-    public AuthController(AuthService authService) {
+    /**
+     * Instantiates a new Auth controller.
+     *
+     * @param authService the auth service
+     * @param userService the user service
+     */
+    public AuthController(AuthService authService, UserService userService) {
+        super(userService);
         this.authService = authService;
     }
 
     /**
-     * Login response entity.
+     * Method for logging in and getting a temporary access token
      *
-     * @param authRequest the auth request
-     * @return the new access token
+     * @param authRequest An object with login credentials
+     * @return New temporary access token
+     * @throws AuthException the auth exception
      */
     @PostMapping("login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest authRequest) {
-        final LoginResponse token;
-        try {
-            token = authService.login(authRequest);
-        } catch (AuthException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
-        }
+    public ResponseEntity<?> login(@RequestBody LoginRequest authRequest) throws AuthException {
+        final LoginResponse token = authService.login(authRequest);
         return ResponseEntity.ok(token);
     }
 
@@ -50,39 +54,39 @@ public class AuthController {
         if (request.getEmail() == null || request.getEmail().isBlank() || request.getPassword() == null || request.getPassword().isBlank())
             return new ResponseEntity<>("Empty login or password", HttpStatus.BAD_REQUEST);
         if (!authService.register(request))
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     /**
-     * Gets new access token.
+     * Method for obtaining new temporary access token
      *
-     * @param request the request
-     * @return the new access token
+     * @param request An object with data for updating the access token
+     * @return new temporary access token
+     * @throws AuthException the auth exception
      */
     @PostMapping("token")
-    public ResponseEntity<?> getNewAccessToken(@RequestBody RefreshJwtRequest request) {
-        final LoginResponse token;
-        try {
-            token = authService.getAccessToken(request.getRefreshToken(), request.getAccessToken());
-        } catch (AuthException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
-        }
+    public ResponseEntity<?> getNewAccessToken(@RequestBody RefreshJwtRequest request) throws AuthException {
+        final NewAccessTokenResponse token =
+                authService.getAccessToken(request.getRefreshToken(), request.getAccessToken());
         return ResponseEntity.ok(token);
     }
 
     /**
-     * Gets new refresh token.
+     * Method for obtaining a new refresh token.
      *
-     * @param request the request
-     * @return the new refresh token
+     * @param request An object with data for updating the refresh token
+     * @return new refresh token
      */
     @PostMapping("refresh")
     public ResponseEntity<?> getNewRefreshToken(@RequestBody NewRefreshJwtRequest request) {
-        final LoginResponse token = authService.getNewRefreshToken(request.getRefreshToken());
+        final var token = authService.getNewRefreshToken(request.getRefreshToken());
 
         return token != null
                 ? ResponseEntity.ok(token)
-                : new ResponseEntity<>("Not refresh valid token", HttpStatus.UNAUTHORIZED);
+                : new ResponseEntity<>(
+                        "Не действительный токен повторного обновления",
+                HttpStatus.UNAUTHORIZED
+        );
     }
 }

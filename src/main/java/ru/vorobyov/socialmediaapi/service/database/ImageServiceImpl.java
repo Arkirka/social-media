@@ -9,10 +9,18 @@ import ru.vorobyov.socialmediaapi.repository.ImageRepository;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The implementation of  Image service.
+ */
 @Service("imageService")
 public class ImageServiceImpl implements ImageService {
     private final ImageRepository imageRepository;
 
+    /**
+     * Instantiates a new Image service.
+     *
+     * @param imageRepository the image repository
+     */
     public ImageServiceImpl(ImageRepository imageRepository) {
         this.imageRepository = imageRepository;
     }

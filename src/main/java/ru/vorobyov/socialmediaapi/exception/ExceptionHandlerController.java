@@ -1,6 +1,7 @@
 package ru.vorobyov.socialmediaapi.exception;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.security.auth.message.AuthException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,9 +12,17 @@ import ru.vorobyov.socialmediaapi.dto.exception.ApiErrorResponse;
 
 import java.util.Date;
 
+/**
+ * The type Exception handler controller.
+ */
 @RestControllerAdvice
 public class ExceptionHandlerController {
 
+    /**
+     * Handle method argument not valid api error response.
+     *
+     * @return the api error response
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
@@ -25,6 +34,11 @@ public class ExceptionHandlerController {
         );
     }
 
+    /**
+     * Handle entity not found api error response.
+     *
+     * @return the api error response
+     */
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
@@ -32,6 +46,23 @@ public class ExceptionHandlerController {
         return new ApiErrorResponse(
                 "Запись не найдена",
                 HttpStatus.NOT_FOUND.value(),
+                new Date()
+        );
+    }
+
+    /**
+     * Handle unauthorized api error response.
+     *
+     * @param e the exception
+     * @return the api error response
+     */
+    @ExceptionHandler(AuthException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseBody
+    public ApiErrorResponse handleUnauthorized(AuthException e) {
+        return new ApiErrorResponse(
+                e.getMessage(),
+                HttpStatus.UNAUTHORIZED.value(),
                 new Date()
         );
     }

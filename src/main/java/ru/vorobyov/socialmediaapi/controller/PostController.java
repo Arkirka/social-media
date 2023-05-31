@@ -30,6 +30,13 @@ public class PostController extends BaseController{
     private final PostService postService;
     private final ImageService imageService;
 
+    /**
+     * Instantiates a new Post controller.
+     *
+     * @param postService  the post service
+     * @param userService  the user service
+     * @param imageService the image service
+     */
     public PostController(PostService postService, UserService userService,
                           ImageService imageService) {
         super(userService);
@@ -129,7 +136,9 @@ public class PostController extends BaseController{
     }
 
     private PostDto parsePostToDto(Post post) {
-        var images = parseImageListToDto(post.getImageList());
+        var images = post.getImageList() == null
+                || post.getImageList().isEmpty()
+                ? null : parseImageListToDto(post.getImageList());
         var user = post.getUser();
         var name = user.getFirstName() + " " + user.getLastName();
         return new PostDto(
@@ -154,7 +163,7 @@ public class PostController extends BaseController{
     public ResponseEntity<?> updateById(@PathVariable Long postID, @RequestBody ModifyPostRequest request) {
         boolean isImagesEmpty = request.getImages() == null || request.getImages().isEmpty();
 
-        if (!isUpdateRequestValid(postID, request))
+        if (!isUpdateRequestValid(postID))
             return getNotFoundResponse("У вас не найдено такой записи!");
 
         Post post = parseDtoToPost(request);
@@ -175,7 +184,7 @@ public class PostController extends BaseController{
         return ResponseEntity.noContent().build();
     }
 
-    private boolean isUpdateRequestValid(Long postID, ModifyPostRequest request){
+    private boolean isUpdateRequestValid(Long postID){
         var postOptional = postService.findById(postID);
         if (postOptional.isEmpty())
             return false;

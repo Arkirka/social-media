@@ -30,6 +30,14 @@ public class UserController extends BaseController{
     private final SubscriptionService subscriptionService;
     private final FriendshipService friendshipService;
 
+    /**
+     * Instantiates a new User controller.
+     *
+     * @param userService              the user service
+     * @param friendshipRequestService the friendship request service
+     * @param subscriptionService      the subscription service
+     * @param friendshipService        the friendship service
+     */
     UserController(UserService userService,
                    FriendshipRequestService friendshipRequestService,
                    SubscriptionService subscriptionService,

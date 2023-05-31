@@ -27,6 +27,14 @@ public class FriendshipController extends BaseController{
     private final SubscriptionService subscriptionService;
     private final MessageService messageService;
 
+    /**
+     * Instantiates a new Friendship controller.
+     *
+     * @param userService         the user service
+     * @param friendshipService   the friendship service
+     * @param subscriptionService the subscription service
+     * @param messageService      the message service
+     */
     FriendshipController(UserService userService,
                          FriendshipService friendshipService,
                          SubscriptionService subscriptionService,
@@ -96,7 +104,13 @@ public class FriendshipController extends BaseController{
         return ResponseEntity.noContent().build();
     }
 
-    private User getFriend(Friendship friendship){
+    /**
+     * Get friend user.
+     *
+     * @param friendship the friendship
+     * @return the user
+     */
+    User getFriend(Friendship friendship){
         var currentUser = getCurrentUser();
         boolean isFriendFirst =
                 friendship.getUser().getId().equals(currentUser.getId());
