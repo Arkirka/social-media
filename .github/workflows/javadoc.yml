@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'src/main/java/**'
+      - '.github/workflows/javadoc.yml'
 
 jobs:
   build:
